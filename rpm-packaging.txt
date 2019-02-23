@@ -1,0 +1,31 @@
+
+Miroslav Suchý
+- http://miroslav.suchy.cz/
+
+RPM Copr repo Miroslav Suchy
+- https://copr.fedorainfracloud.org/coprs/msuchy/gis/packages/
+
+
+RPM Packaging Guide
+- https://github.com/redhat-developer/rpm-packaging-guide/
+- https://rpm-packaging-guide.github.io/
+
+Parallel sw
+- https://www.gnu.org/software/parallel/
+
+
+
+
+
+
+Image Magick
+- https://www.imagemagick.org/download/linux/SRPMS/
+
+OpenEXR
+- http://www.openexr.com/downloads.html
+
+HDF5
+- https://www.hdfgroup.org/downloads/hdf5/
+
+Enblend
+- https://centos.pkgs.org/7/nux-dextop-x86_64/enblend-4.1.1-3.fc19.x86_64.rpm.html
