@@ -1,0 +1,147 @@
+
+#This is not code!!!
+
+
+[michal.srejber@localhost ~]$ sudo yum install rpm-build mock rpmdevtools rpmlint fedora-packager fedpkg patch
+[michal.srejber@localhost ~]$ wget "miroslav.suchy.cz/presentations/enum-1.1.tar.bz2"
+
+# Do not use createrepo, use createrepo_c instead!! (faster)
+# Configuration better over Ansible or multiple packages
+
+
+#rpmlint ~/rpmbuild/SRPMS/*.src.rpm # check source package
+#rpmlint ~/rpmbuild/RPMS/*.rpm # check source package
+
+#https://fedoraproject.org/wiki/Packaging:Guidelines
+
+#Do not:
+	#Do not se spec generators (they are good starts)
+	#Do not build from binaries (except proprietary SW)
+	#Do not disable check for unpacked files
+rpm -e enum #for remove
+
+#if you install srpm, it is not in DB (it places to ~/rpmbuild/SOURCES)
+
+#rpmbuild supports debugging (it do prep part and stops ect.)
+
+# RPM MACROS
+# - like variables in shell
+# 	- integers or strings (better work with them like with all is string)
+# rpm --showrc # show all macros (Huraaaaaaaaaaa)
+# rpm --eval '%{__perl_requires}' # eval some macro
+# %{foo} and $foo are same, prefer %{foo} style of macro styles
+# macros in comments will expanded!!!!!!!!!!
+# macros can be from Lua
+# to comment (zakomentovani makra) is doing by %%{foo}
+# questionmark '?' will means try to evaluate, so for %{?dist} evaluate or evaluate to nothing
+#	- there can be defined default value (little different macro)
+
+rpm -qR bash # show some dependencies, work with bash and pearl (automatic added library), every others packages put it in the specfile
+
+# character '#' is for comments
+# ~/.rpmmacros # file for overwrite system macro
+# %{_smp_mflags} #macro for choosing core count for make
+
+# never build as root
+# use git!!
+
+# python-foo # use prefix variation (python as first)
+# with end of python2, difference will be there will be underpackage python2-* and python3-
+
+#fuziness - set to zero in rebuild (can badly apply patch)
+
+# SPEC file
+# -Preamble
+#	- descriptions
+#	- macros Group and Buildroot are for example ignored
+#	- do not use git checksums as version
+#	- release number - change with change of release or after adding patch
+#	- Summary - Single sentence and must not end with dot! (maximum 80 characters)
+#	- License - name or file name with license
+#			- fedora licensing chart: https://fedoraproject.org/wiki/Licensing:Main#Software_License_List
+#			- check licensing!!
+#			- use existing license
+#			- if there is more licenses (MIT, GPLv2, BSD, ...), place everything with "and" between and comment above it what is for what (like code is GPLv2, doc is BSD, ...)
+#			- it is possible place there "Proprietary" there and license place in file inside package or on website
+#	- Group - useless, erase it
+#	- URL - upstream location (use it even if website no longer exists)
+#	- SOURCEX - where X is number, counting from 0. where to take sources
+#	- %description - it takes even new lines, it can be long as we want
+#	- BuildRequires - recommended on single line for one dependency, put everything (like gcc)
+#		- it is possible some packages like gcc can be missing, but are needed
+#	- Requires - packages required for runtime
+#	- Provides - historic reasons, very commonly used
+# -Setup
+#	- manipulation with sources
+#	- example:
+#			%prep
+#			%setup -q
+#			%patch -p1
+#			%patch0 -p0 -b .fixbugs # this is for debug
+# -Build
+#	- create binary components (artefacts)
+#	- check README of the sources for how to install it
+#	- rpmbuild -bc hellowrold.spec # -b for build, -c for compile and stop
+#	- %configure --disable-doc-rebuild is possible, case specific
+# -Install
+#	- it is working in %buildroot directory (centos has default ~/rpmbuild/BUILDROOT/)
+#	- example:
+#			%install
+#			make DESTDIR=%{buildroot} install # DESTDIR is common Makefile variable 
+# -Clean
+# -Files
+#	- which files will be content of binary package
+#	- rpm will complain about unpackaged files
+#	- do not generate files in %post part (NEVER)
+#	- "%defattr" set attributes. Default is "(-,root,root,-)", almost never change it
+#	- example:
+#			%attr(600) /etc/foo
+# -Changelog
+#	- do not change changelog from upstream
+#	- rpmdev has command for adding changes rpmdev-bumpspec
+#
+#	Example for %files section
+#	%files
+#	%license COPYING
+#	%doc ChangeLog
+#	%_mandir/man1/enum.1*
+#	%_bindir/enum
+#
+#
+# %if 0{?rhel} == 6 || 0{?%fedora} < 17 # if macro expanded to empty string, use zero (that before macro)
+#
+# BuildArch: noarch #x86_64, ...
+
+
+# Best practice
+# 	- use patches over sed in %prep/%post/...
+# 	- do not call rpm from inside spec
+
+
+# Install happen during compiling during building, not on user machine!!
+# %pre %post %postun % happen on user machine
+# Be carefull with %pre section. For example anaconda can be install before bash, so bash command is going to fail
+#	- in this case use Lua (is part of rpm)
+# %posttrans - run after entire transaction (during install XXX packages, run it after install everything)
+
+
+#architectures configurations /etc/mock/
+#mockchain - have add repo, check it
+#mock - nonstandard repo must be paste inside architecture config
+
+# two versions of one software
+#softwarecollections.org
+#containers
+
+
+# %package for more subpackages
+
+rpm -ql package-name-installed
+rpm -qlp package-name-not-installed
+
+# dido project for create packages
+
+
+
+# Tutorial
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/rpm_packaging_guide/index
